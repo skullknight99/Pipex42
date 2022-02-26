@@ -6,7 +6,7 @@
 /*   By: acmaghou <muteallfocus7@gmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/18 10:17:30 by acmaghou          #+#    #+#             */
-/*   Updated: 2022/02/23 14:08:34 by acmaghou         ###   ########.fr       */
+/*   Updated: 2022/02/25 17:36:03 by acmaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ int			ft_toupper(int c);
 int			ft_tolower(int c);
 int			ft_lstsize(t_list *lst);
 int			ft_memcmp(const void *s1, const void *s2, size_t n);
+int			ft_strcmp(const char *s1, const char *s2);
 int			ft_strncmp(const char *s1, const char *s2, size_t n);
 char		*ft_itoa(int n);
 char		*ft_strdup(const char *src);

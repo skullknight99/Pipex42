@@ -6,7 +6,7 @@
 /*   By: acmaghou <muteallfocus7@gmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/20 22:48:02 by acmaghou          #+#    #+#             */
-/*   Updated: 2022/02/23 14:08:34 by acmaghou         ###   ########.fr       */
+/*   Updated: 2022/02/25 17:33:10 by acmaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	int		i;
 	int		k;
 
-	if (s1 == NULL || s1 == NULL)
+	if (s1 == NULL || s2 == NULL)
 		return (NULL);
 	new = (char *)malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + 1));
 	if (new == NULL)

@@ -6,19 +6,23 @@
 /*   By: acmaghou <muteallfocus7@gmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/21 17:09:55 by acmaghou          #+#    #+#             */
-/*   Updated: 2022/02/23 18:39:31 by acmaghou         ###   ########.fr       */
+/*   Updated: 2022/02/25 18:17:52 by acmaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
 
-void	out_process(char *outfile, char *cmd, char **envp)
+void	out_process(char *av, char *outfile, char *cmd, char **envp)
 {
 	int		fd;
 	int		execstat;
 	char	*path;
 
-	fd = open(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0777);
+	fd = 0;
+	if (check_here_doc(av))
+		fd = open(outfile, O_WRONLY | O_CREAT | O_APPEND, 0777);
+	else
+		fd = open(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0777);
 	if (fd == -1)
 		puterror("Infile Error ");
 	dup2(fd, STDOUT_FILENO);
@@ -27,7 +31,7 @@ void	out_process(char *outfile, char *cmd, char **envp)
 		puterror("Command not found ");
 	execstat = execve(path, ft_split(cmd, ' '), envp);
 	if (execstat == -1)
-		puterror("Execve Error command failed/not founded ");
+		puterror("Execve Error command failed/not found ");
 }
 
 static void	in_process(char *infile)
@@ -57,7 +61,7 @@ static void	do_pipe(char *cmd, char **envp)
 		dup2(fds[1], STDOUT_FILENO);
 		path = find_path(envp, cmd);
 		if (!path || execve(path, ft_split(cmd, ' '), envp) == -1)
-			puterror("Execve Error command failed/not founded ");
+			puterror("Execve Error command failed/not found ");
 		waitpid(-1, 0, 0);
 	}
 	else
@@ -72,19 +76,16 @@ void	listen(char *limiter)
 	char	*line;
 	int		fds[2];
 	int		pid;
+	int		len;
 
 	if (pipe(fds) == -1)
 		puterror("Pipe Error ");
 	pid = fork();
+	line = NULL;
 	if (pid == 0)
 	{
-		while (1)
-		{
-			line = get_next_line(0);
-			if (ft_strnstr(line, limiter, ft_strlen(limiter)))
-				exit(-1);
-			write(fds[1], line, ft_strlen(line));
-		}
+		len = ft_strlen(limiter);
+		write_line(fds, line, limiter, len);
 	}
 	else
 	{
@@ -98,6 +99,7 @@ void	listen(char *limiter)
 int	main(int ac, char **av, char **envp)
 {
 	int		index;
+	int		check_doc;
 
 	if (ac < 5)
 	{
@@ -106,7 +108,8 @@ int	main(int ac, char **av, char **envp)
 		return (0);
 	}
 	index = 2;
-	if (!ft_strncmp(av[1], "here_doc", 8))
+	check_doc = check_here_doc(av[1]);
+	if (check_doc)
 	{
 		listen(av[2]);
 		index = 3;
@@ -115,6 +118,6 @@ int	main(int ac, char **av, char **envp)
 		in_process(av[1]);
 	while (index < ac - 2)
 		do_pipe(av[index++], envp);
-	out_process(av[ac - 1], av[ac - 2], envp);
+	out_process(av[1], av[ac - 1], av[ac - 2], envp);
 	return (0);
 }

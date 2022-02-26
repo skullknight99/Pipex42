@@ -6,7 +6,7 @@
 /*   By: acmaghou <muteallfocus7@gmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/04 20:10:24 by acmaghou          #+#    #+#             */
-/*   Updated: 2022/02/23 14:17:50 by acmaghou         ###   ########.fr       */
+/*   Updated: 2022/02/25 18:17:13 by acmaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,4 +46,22 @@ char	*find_path(char **envp, char *cmd)
 	free(sub);
 	free(cmd);
 	return (cmd_path);
+}
+
+void	write_line(int *fds, char *line, char *limiter, int len)
+{
+	while (1)
+	{
+		line = get_next_line(0);
+		if (!ft_strncmp(limiter, line, len) && (line[len] == '\n'))
+			exit(-1);
+		write(fds[1], line, ft_strlen(line));
+	}
+}
+
+int	check_here_doc(char *av)
+{
+	if (!ft_strncmp(av, "here_doc", 8))
+		return (1);
+	return (0);
 }

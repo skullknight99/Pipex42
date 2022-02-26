@@ -1,15 +1,15 @@
 BSRCS	= pipex_bonus.c utils_bonus.c
-SRCS	= pipex.c
+SRCS	= pipex.c pipex_utils.c
 NAME	= pipex
 CC	= gcc
-FLAGS	= -Wall -Werror -Wextra -fsanitize=address
+FLAGS	= -Wall -Werror -Wextra 
 RM	= rm -f
 INCS	= libft/includes
 LIBFT	= -Llibft -lft
 
 all: ${NAME}
 
-${NAME}: runlibft norm
+${NAME}: runlibft
 	${CC} ${FLAGS} -o ${NAME} ${SRCS} -I ${INCS} ${LIBFT}
 
 ignore: runlibft
@@ -26,6 +26,9 @@ fclean: clean
 	make -C libft fclean
 
 re: fclean all
+
+test:
+	$(CC) main.c -I ${INCS} ${LIBFT}
 
 runlibft:
 	make -C libft
