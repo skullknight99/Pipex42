@@ -6,7 +6,7 @@
 /*   By: acmaghou <muteallfocus7@gmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/25 18:21:17 by acmaghou          #+#    #+#             */
-/*   Updated: 2022/02/26 13:15:29 by acmaghou         ###   ########.fr       */
+/*   Updated: 2022/02/26 14:38:38 by acmaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	free_all(char **str)
 	int	i;
 
 	i = 0;
-	while(str[i])
+	while (str[i])
 	{
 		free(str[i]);
 		i++;
@@ -59,8 +59,12 @@ void	check_pid(int pid)
 void	execute_cmd(char *path, char **str, char **envp)
 {
 	int	execstat;
-	
+
 	execstat = execve(path, str, envp);
 	if (execstat == -1)
+	{
+		free_all(str);
+		free(&path);
 		puterror("Execve Error command failed/not found ");
+	}
 }

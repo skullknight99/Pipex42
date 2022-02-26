@@ -6,7 +6,7 @@
 /*   By: acmaghou <muteallfocus7@gmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/21 17:09:55 by acmaghou          #+#    #+#             */
-/*   Updated: 2022/02/26 13:52:37 by acmaghou         ###   ########.fr       */
+/*   Updated: 2022/02/26 14:33:53 by acmaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ static void	in_process(int fds[2], char *infile, char *cmd, char **envp)
 		execute_cmd(path, str, envp);
 		free_all(str);
 		free(path);
-		waitpid(-1, 0, 0);
+		exit(1);
 	}
 }
 
@@ -111,5 +111,6 @@ int	main(int ac, char **av, char **envp)
 	out_process(fds, av[4], av[3], envp);
 	close(fds[0]);
 	close(fds[1]);
+	waitpid(-1, 0, 0);
 	return (0);
 }
