@@ -6,7 +6,7 @@
 /*   By: acmaghou <muteallfocus7@gmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/21 17:09:55 by acmaghou          #+#    #+#             */
-/*   Updated: 2022/02/26 14:33:53 by acmaghou         ###   ########.fr       */
+/*   Updated: 2022/02/27 11:38:20 by acmaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,8 @@
 
 void	puterror(char *str)
 {
-	ft_putstr_fd("\033[0;31m", 2);
 	perror(str);
-	ft_putstr_fd("\033[0m", 2);
-	exit(-1);
+	exit(1);
 }
 
 static char	*find_path(char **envp, char *cmd)
@@ -29,8 +27,10 @@ static char	*find_path(char **envp, char *cmd)
 
 	str = ft_split(cmd, ' ');
 	cmd = ft_strdup(*str);
-	while (*envp && !ft_strnstr(*envp, "PATH=", 5))
+	while (*envp && ft_memcmp(*envp, "PATH=", 5) != 0)
 		envp++;
+	if (!*envp)
+		return (NULL);
 	sub = ft_substr(*envp, 5, ft_strlen(*envp) - 5);
 	paths = ft_split(sub, ':');
 	free(sub);
@@ -63,10 +63,12 @@ static void	out_process(int fds[2], char *outfile, char *cmd, char **envp)
 		check_fd(fd);
 		dup2(fds[0], STDIN_FILENO);
 		dup2(fd, STDOUT_FILENO);
-		execute_cmd(path, str, envp);
+		execve(path, str, envp);
 		free_all(str);
 		free(path);
+		puterror("Execve Error command failed/not found ");
 	}
+	free_all(str);
 }
 
 static void	in_process(int fds[2], char *infile, char *cmd, char **envp)
@@ -89,11 +91,12 @@ static void	in_process(int fds[2], char *infile, char *cmd, char **envp)
 		path = find_path(envp, cmd);
 		if (!path)
 			puterror("Command not found ");
-		execute_cmd(path, str, envp);
+		execve(path, str, envp);
 		free_all(str);
 		free(path);
-		exit(1);
+		puterror("Execve Error command failed/not found ");
 	}
+	free_all(str);
 }
 
 int	main(int ac, char **av, char **envp)
@@ -109,8 +112,8 @@ int	main(int ac, char **av, char **envp)
 		puterror("Pipe Error ");
 	in_process(fds, av[1], av[2], envp);
 	out_process(fds, av[4], av[3], envp);
+	waitpid(-1, 0, 0);
 	close(fds[0]);
 	close(fds[1]);
-	waitpid(-1, 0, 0);
 	return (0);
 }

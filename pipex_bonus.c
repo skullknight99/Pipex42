@@ -6,7 +6,7 @@
 /*   By: acmaghou <muteallfocus7@gmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/21 17:09:55 by acmaghou          #+#    #+#             */
-/*   Updated: 2022/02/25 18:17:52 by acmaghou         ###   ########.fr       */
+/*   Updated: 2022/02/26 18:45:02 by acmaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,23 +15,24 @@
 void	out_process(char *av, char *outfile, char *cmd, char **envp)
 {
 	int		fd;
-	int		execstat;
 	char	*path;
+	char	**str;
 
+	str = ft_split(cmd, ' ');
 	fd = 0;
+	path = find_path(envp, cmd);
+	if (!path)
+		puterror("Command not found ");
 	if (check_here_doc(av))
 		fd = open(outfile, O_WRONLY | O_CREAT | O_APPEND, 0777);
 	else
 		fd = open(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0777);
-	if (fd == -1)
-		puterror("Infile Error ");
+	check_fd(fd);
 	dup2(fd, STDOUT_FILENO);
-	path = find_path(envp, cmd);
-	if (!path)
-		puterror("Command not found ");
-	execstat = execve(path, ft_split(cmd, ' '), envp);
-	if (execstat == -1)
-		puterror("Execve Error command failed/not found ");
+	execve(path, ft_split(cmd, ' '), envp);
+	free_all(str);
+	free(path);
+	puterror("Execve Error command failed/not found ");
 }
 
 static void	in_process(char *infile)

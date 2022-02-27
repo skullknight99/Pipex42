@@ -6,7 +6,7 @@
 /*   By: acmaghou <muteallfocus7@gmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/25 18:21:17 by acmaghou          #+#    #+#             */
-/*   Updated: 2022/02/26 14:38:38 by acmaghou         ###   ########.fr       */
+/*   Updated: 2022/02/26 18:33:02 by acmaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,30 +41,19 @@ char	*check_paths(char **paths, char *sub)
 		free(cmd_path);
 		i++;
 	}
+	if (!paths[i])
+		return (NULL);
 	return (cmd_path);
 }
 
 void	check_fd(int fd)
 {
 	if (fd == -1)
-		puterror("Error ");
+		ft_putstr_fd("Pipe Error ", 2);
 }
 
 void	check_pid(int pid)
 {
 	if (pid == -1)
-		puterror("Fork Error ");
-}
-
-void	execute_cmd(char *path, char **str, char **envp)
-{
-	int	execstat;
-
-	execstat = execve(path, str, envp);
-	if (execstat == -1)
-	{
-		free_all(str);
-		free(&path);
-		puterror("Execve Error command failed/not found ");
-	}
+		ft_putstr_fd("Fork Error ", 2);
 }

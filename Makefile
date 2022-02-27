@@ -1,8 +1,8 @@
-BSRCS	= pipex_bonus.c utils_bonus.c
+BSRCS	= pipex_bonus.c utils_bonus.c pipex_utils.c
 SRCS	= pipex.c pipex_utils.c
 NAME	= pipex
 CC	= gcc
-FLAGS	= -Wall -Werror -Wextra 
+FLAGS	= -Wall  -Werror -Wextra 
 RM	= rm -f
 INCS	= libft/includes
 LIBFT	= -Llibft -lft

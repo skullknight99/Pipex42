@@ -6,7 +6,7 @@
 /*   By: acmaghou <muteallfocus7@gmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/04 20:10:24 by acmaghou          #+#    #+#             */
-/*   Updated: 2022/02/25 18:17:13 by acmaghou         ###   ########.fr       */
+/*   Updated: 2022/02/26 18:38:14 by acmaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,26 +25,23 @@ char	*find_path(char **envp, char *cmd)
 	char	**paths;
 	char	*cmd_path;
 	char	*sub;
+	char	**str;
 
-	cmd = *ft_split(cmd, ' ');
-	while (*envp && !ft_strnstr(*envp, "PATH=", 5))
+	str = ft_split(cmd, ' ');
+	cmd = ft_strdup(*str);
+	while (*envp && ft_memcmp(*envp, "PATH=", 5) != 0)
 		envp++;
+	if (!*envp)
+		return (NULL);
 	sub = ft_substr(*envp, 5, ft_strlen(*envp) - 5);
 	paths = ft_split(sub, ':');
 	free(sub);
 	sub = ft_strjoin("/", cmd);
-	while (*paths)
-	{
-		cmd_path = ft_strjoin(*paths, sub);
-		if (!cmd_path)
-			return (NULL);
-		if (!access(cmd_path, F_OK))
-			break ;
-		free(cmd_path);
-		paths++;
-	}
-	free(sub);
+	cmd_path = check_paths(paths, sub);
 	free(cmd);
+	free(sub);
+	free_all(str);
+	free_all(paths);
 	return (cmd_path);
 }
 
