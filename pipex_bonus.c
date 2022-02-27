@@ -11,7 +11,14 @@
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
-
+/*
+opens the output file, based on 2 uses (here_doc or multiple pipes)
+and makes it the STDOUT , execve executes the cmd if it exists
+then exits the line of execution resulting in the end of the program,
+if thats not the case then we free the command paths and the 2d array
+that contains the commands + their options then and only then it exits
+through the put error function.
+*/
 void	out_process(char *av, char *outfile, char *cmd, char **envp)
 {
 	int		fd;
@@ -34,7 +41,7 @@ void	out_process(char *av, char *outfile, char *cmd, char **envp)
 	free(path);
 	puterror("Execve Error command failed/not found ");
 }
-
+// function responsible of opening the infile and making it work as STDIN
 static void	in_process(char *infile)
 {
 	int	fd;
@@ -44,7 +51,12 @@ static void	in_process(char *infile)
 		puterror("Infile Error ");
 	dup2(fd, STDIN_FILENO);
 }
-
+/* 
+Takes given command and inside the child process (result of piping the file descriptors) 
+executes it resulting in finishing the child process and beginning of parent process
+that closes the writing pipe (since it has already been used)
+and duplicates the reading end in order to use it as input for next command.
+*/
 static void	do_pipe(char *cmd, char **envp)
 {
 	int		fds[2];
@@ -56,19 +68,24 @@ static void	do_pipe(char *cmd, char **envp)
 	pid = fork();
 	if (pid == -1)
 		puterror("Fork Error ");
-	if (pid == 0)
+	if (pid == 0) //child process
 	{
 		close(fds[0]);
 		dup2(fds[1], STDOUT_FILENO);
 		path = find_path(envp, cmd);
+		//if we fail to find path for example the "lsd" command
+		//will be tested on all paths for example /usr/bin/lsd
+		//if not found then it returns NULL.
+		//i think we can shorten this code a bit more.
 		if (!path || execve(path, ft_split(cmd, ' '), envp) == -1)
 			puterror("Execve Error command failed/not found ");
 		waitpid(-1, 0, 0);
 	}
 	else
 	{
-		close(fds[1]);
-		dup2(fds[0], STDIN_FILENO);
+		close(fds[1]); //close writing end
+		dup2(fds[0], STDIN_FILENO); //fds[0] now does same job as STDIN_FILENO
+		// basically next command will take the output of this command as input
 	}
 }
 
@@ -117,8 +134,13 @@ int	main(int ac, char **av, char **envp)
 	}
 	else
 		in_process(av[1]);
+	//in case of multiple pipes index = 2, so we start the do_pipe command from cmd1
+	//example : ./pipex infile cmd1 cmd2 ... cmdn outfile
+	//in here_doc case we start at index=3 so we skip the limiter and start at cmd1
+	//example: ./pipex here_doc limiter cmd1 cmd2 outfile
 	while (index < ac - 2)
 		do_pipe(av[index++], envp);
+	//function responsible of opening and writing to the outfile
 	out_process(av[1], av[ac - 1], av[ac - 2], envp);
 	return (0);
 }
